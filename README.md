@@ -8,6 +8,9 @@ Description: This is the QanvasLab Microscopy Figure Builder, a tool aiming to o
   		Anyone who prepared microscopy figures for manuscripts or presentations knows that it's very frustrating. This tool hopefully reduces
   		that frustration by allowing fellow scientists to prepare microscopy figures with the ability to customize panel distribution, zoomed insets,
   		borders, color, text and arrow annotations, etc. 
+
+How to launch: There are many ways to launch a macro in ImageJ. The most straight forward approach is to open ImageJ/FIJI and then
+    Plugins > Macros > Run > Select the IJM file and follow the GUI
     
 Environment: FIJI/ImageJ 1.54f with the following list of plugins. Please note, most of the plugins were not used in this macro, but to  
   		prevent incompatibility issues, the list contains everything in the ImageJ version that was used to develop the tool:
