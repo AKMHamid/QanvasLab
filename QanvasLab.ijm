@@ -45,7 +45,7 @@ while (true) {
 	// GUI
 	Dialog.create("QanvasLab Microscopy Figure Builder");
 	// Directories
-	Dialog.addDirectory("Images folder", "C:/Users/akmha/Desktop/Laurine binnned/");
+	Dialog.addDirectory("Images folder", "/Path/");
 	Dialog.addDirectory("Output folder", "/Path/");
 	// Image info
 	Dialog.addCheckbox("Not all images are of the same size / enable cropping functionality", true);
