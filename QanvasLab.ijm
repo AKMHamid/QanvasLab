@@ -98,7 +98,7 @@ while (true) {
 						"click any ImageJ windows during a processing step, as changing the active window can lead to unexpected\n" +
 						"behavior. For more information please contact me on GitHub\n" + 
 						"with the 'Help' button below. ");
-	Dialog.addHelp("www.google.ca");
+	Dialog.addHelp("https://github.com/AKMHamid/QanvasLab/");
 	
 	
 	Dialog.show();
