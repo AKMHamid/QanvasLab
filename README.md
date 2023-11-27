@@ -2,6 +2,7 @@
 QanvasLab Microscopy Figure Builder, an ImageJ/FIJI macro
 
 Author: Ahmad Kamal Hamid, University of Zurich
+
 Version: 1.0, 27/11/2023 
  
 Description: This is the QanvasLab Microscopy Figure Builder, a tool aiming to optimize the balance between customizability and user-friendliness.
