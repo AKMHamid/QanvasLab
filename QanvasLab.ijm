@@ -1,5 +1,6 @@
 /* Author: Ahmad Kamal Hamid, University of Zurich
- * Version: 1.0, 27/11/2023
+ * Version: 1.1, 28/11/2023
+ * 		Changes: Restructured initial GUI architecture to multi-step due to lack of ImageJ functionality of scroll bars.
  * 
  * Description: This is the QanvasLab Microscopy Figure Builder, a tool aiming to optimize the balance between customizability and user-friendliness.
  * 		Anyone who prepared microscopy figures for manuscripts or presentations knows that it's very frustrating. This tool hopefully reduces
@@ -42,108 +43,145 @@ close("*");
 run("Collect Garbage");
 
 while (true) {
-	// GUI
-	Dialog.create("QanvasLab Microscopy Figure Builder");
-	// Directories
-	Dialog.addDirectory("Images folder", "/Path/");
-	Dialog.addDirectory("Output folder", "/Path/");
-	// Image info
-	Dialog.addCheckbox("Not all images are of the same size / enable cropping functionality", true);
-	// Figure info
-	Dialog.addMessage("General parameters", 20, "blue");
-	Dialog.addChoice("Overall background", newArray("white", "black"), "white");
-	Dialog.addChoice("Figure type", newArray("8-bit", "RGB"), "RGB");
-	// Compression
-	Dialog.addMessage("Without binning, a 'zoomed' inset is technically impossible. Please select a compression approach for the images:");
-	Dialog.addChoice("Bin method ", newArray("Average", "Median", "Min", "Max", "Sum"), "Median");
-	Dialog.addNumber("Image shrink factor", 4, 2, 27, "X");
-	// Panel borders
-	Dialog.addMessage("Panel parameters", 20, "blue");
-	Dialog.addNumber("Panel border thickness (0 = none)", 50, 0, 27, "px");
-	Dialog.addString("Panel border color (r,g,b)", "0, 0, 0", 27);
-	// Panel distribution, dimensions, spacing
-	Dialog.addString("Dimension in panels, W x H", "5 x 3", 27);
-	Dialog.addNumber("Panel spacing (% of panel width)", 5, 2, 27, "%");
-	// Panel annotation
-	Dialog.addCheckbox("Add text annotations", true);
-	Dialog.addCheckbox("Add arrow annotations", true);
-	// Original inset info
-	Dialog.addMessage("Original inset parameters", 20, "blue");
-	Dialog.addCheckbox("Do not use zoomed inset functionality", false);
-	Dialog.addNumber("Original inset border thickness (0 = none)", 5, 0, 27, "px");
-	Dialog.addString("Original inset border color (r,g,b)", "255, 0, 0", 27);
-	// Zoomed inset info
-	Dialog.addMessage("Zoomed inset parameters", 20, "blue");
-	Dialog.addNumber("Zoom factor", 4, 2, 27, "X");
-	Dialog.addCheckbox("Zoomed inset border on top of panel border", false);
-	Dialog.addNumber("Zoomed inset border thickness (0 = none)", 20, 0, 27, "px");
-	Dialog.addString("Zoomed inset border color (r,g,b)", "0, 0, 0", 27);
-	// Inset trace info
-	Dialog.addCheckbox("Draw original to zoomed insets trace lines", true);
-	Dialog.addNumber("Trace line thickness", 3, 0, 27, "px");
-	Dialog.addString("Trace line color (r,g,b)", "0, 0, 0", 27);
-	// Scale
-	Dialog.addMessage("Calibration and scale bars", 20, "blue");
-	Dialog.addNumber("Scale", 3, 10, 27, "unit per px");
-	Dialog.addString("Scale unit", "unit", 27);
-	Dialog.addCheckbox("Panel scale bar", true);
-	Dialog.addCheckbox("Inset scale bar", true);
-	Dialog.addCheckbox("Use metadata scale info, ignore manual input", false);
-	// Notes
-	Dialog.addMessage("", 20, "blue");
-	Dialog.addMessage("Throughout the execution of this macro, a large number of windows and user prompts will appear. This is\n" + 
-						"to maximize customizability and circumvent errors. Please note that for most prompts, clicking 'Cancel'\n" +
-						"will abort the macro altogether. Also, please avoid using the 'enter' or 'space' keys to click a certain not\n" +
-						"button in the prompts, as ImageJ does not always execute the highlighted button. It is also important to\n" + 
-						"click any ImageJ windows during a processing step, as changing the active window can lead to unexpected\n" +
-						"behavior. For more information please contact me on GitHub\n" + 
-						"with the 'Help' button below. ");
-	Dialog.addHelp("https://github.com/AKMHamid/QanvasLab/");
-	
-	
-	Dialog.show();
-	
-	
-	// Fetching inputs
-	// Directories
-	inputDir = Dialog.getString();
-	outputDir = Dialog.getString();
-	// Image info
-	imageSizeHomogeneity = Dialog.getCheckbox();
-	// Figure info
-	overallBG = Dialog.getChoice();
-	figType = Dialog.getChoice();
-	// Compression
-	binMethod = Dialog.getChoice();
-	imgShrinkFactor = Dialog.getNumber();
-	// Panel borders
-	panelBorderThickness = Dialog.getNumber();
-	panelBorderColor = Dialog.getString();
-	// Panel dimensions and spacing
-	dimensionPanels = Dialog.getString();
-	panelSpacing = Dialog.getNumber();
-	// Panel annotations
-	addTextAnnotations = Dialog.getCheckbox();
-	addArrowAnnotations = Dialog.getCheckbox();
-	// Original inset info
-	noInset = Dialog.getCheckbox();
-	roiInPanelThickness = Dialog.getNumber();
-	roiInPanelBorderColor = Dialog.getString();
-	// Zoomed inset info
-	insetZoom = Dialog.getNumber();
-	insetBorderOnTop = Dialog.getCheckbox();
-	insetBorderThickness = Dialog.getNumber();
-	insetBorderColor = Dialog.getString();
-	// Inset trace info
-	drawTrace = Dialog.getCheckbox();
-	traceLineThickness = Dialog.getNumber();
-	traceLineColor = Dialog.getString();
-	// Scale
-	lenPerPx = Dialog.getNumber();
-	scaleUnit = Dialog.getString();
-	addPanelScaleBar = Dialog.getCheckbox();
-	addInsetScaleBar = Dialog.getCheckbox();
-	useMDScale = Dialog.getCheckbox();
+	GUITabs = newArray("General Parameters", "Panel Parameters", "Inset Parameters", "Calibration Parameters");
+	while (true) {
+		Dialog.create("QanvasLab Microscopy Figure Builder");
+		Dialog.addMessage("Please adjust the parameters by category.\nSelect one from the menu and click OK", 15, "blue");
+		Dialog.addChoice("Parameter Type", GUITabs, GUITabs[0]);
+		
+		Dialog.show();
+		
+		parameterChoice = Dialog.getChoice();
+		
+		if (parameterChoice == "General Parameters") {
+			Dialog.create("General Parameters");
+			// Directories
+			Dialog.addDirectory("Images folder", "/Path/");
+			Dialog.addDirectory("Output folder", "/Path/");
+			// Image shape homogeneity
+			Dialog.addCheckbox("Not all images are of the same size / enable cropping functionality", true);
+			// Figure parameters
+			Dialog.addChoice("Overall background", newArray("white", "black"), "white");
+			Dialog.addChoice("Figure type", newArray("8-bit", "RGB"), "RGB");
+			
+			Dialog.show();
+			
+			// Fetching inputs
+			// Directories
+			inputDir = Dialog.getString();
+			outputDir = Dialog.getString();
+			// Image shape hommogeneity
+			imageSizeHomogeneity = Dialog.getCheckbox();
+			// Figure parameters
+			overallBG = Dialog.getChoice();
+			figType = Dialog.getChoice();
+			
+			// Updating parameter menu
+			GUITabs = Array.deleteValue(GUITabs, parameterChoice);
+			continue;
+		} else if (parameterChoice == "Panel Parameters") {
+			Dialog.create("Panel Parameters");
+			// Compression info
+			Dialog.addMessage("Without binning, a 'zoomed' inset is technically impossible. Please select a compression approach for the images:");
+			Dialog.addChoice("Bin method ", newArray("Average", "Median", "Min", "Max", "Sum"), "Median");
+			Dialog.addNumber("Image shrink factor", 4, 2, 27, "X");
+			// Panel borders
+			Dialog.addNumber("Panel border thickness (0 = none)", 50, 0, 27, "px");
+			Dialog.addString("Panel border color (r,g,b)", "0, 0, 0", 27);
+			// Panel distribution and spacing
+			Dialog.addString("Dimension in panels, W x H", "5 x 3", 27);
+			Dialog.addNumber("Panel spacing (% of panel width)", 5, 2, 27, "%");
+			// Panel annotation
+			Dialog.addCheckbox("Add text annotations", true);
+			Dialog.addCheckbox("Add arrow annotations", true);
+			
+			Dialog.show();
+			
+			// Fetching inputs
+			// Compression info
+			binMethod = Dialog.getChoice();
+			imgShrinkFactor = Dialog.getNumber();			
+			// Panel borders
+			panelBorderThickness = Dialog.getNumber();
+			panelBorderColor = Dialog.getString();
+			// Panel distribution and spacing
+			dimensionPanels = Dialog.getString();
+			panelSpacing = Dialog.getNumber();
+			// Panel annotation
+			addTextAnnotations = Dialog.getCheckbox();
+			addArrowAnnotations = Dialog.getCheckbox();
+			
+			// Updating parameter menu
+			GUITabs = Array.deleteValue(GUITabs, parameterChoice);
+			continue;
+		} else if (parameterChoice == "Inset Parameters") {
+			Dialog.create("Inset Parameters");
+			// Inset boolean
+			Dialog.addCheckbox("Do not use zoomed inset functionality", false);
+			// Original inset info
+			Dialog.addMessage("Original inset parameters", 15, "blue");
+			Dialog.addNumber("Original inset border thickness (0 = none)", 5, 0, 27, "px");
+			Dialog.addString("Original inset border color (r,g,b)", "255, 0, 0", 27);
+			// Zoomed inset info
+			Dialog.addMessage("Zoomed inset parameters", 15, "blue");
+			Dialog.addCheckbox("Zoomed inset border on top of panel border", false);
+			Dialog.addNumber("Zoom factor", 4, 2, 27, "X");
+			Dialog.addNumber("Zoomed inset border thickness (0 = none)", 20, 0, 27, "px");
+			Dialog.addString("Zoomed inset border color (r,g,b)", "0, 0, 0", 27);
+			// Inset trace info
+			Dialog.addMessage("Inset trace parameters", 15, "blue");
+			Dialog.addCheckbox("Draw original to zoomed insets trace lines", true);
+			Dialog.addNumber("Trace line thickness", 3, 0, 27, "px");
+			Dialog.addString("Trace line color (r,g,b)", "0, 0, 0", 27);
+			
+			Dialog.show();
+			
+			// Fetching inputs
+			// Inset boolean
+			noInset = Dialog.getCheckbox();
+			// Original inset info
+			roiInPanelThickness = Dialog.getNumber();
+			roiInPanelBorderColor = Dialog.getString();
+			// Zoomed inset info
+			insetBorderOnTop = Dialog.getCheckbox();
+			insetZoom = Dialog.getNumber();
+			insetBorderThickness = Dialog.getNumber();
+			insetBorderColor = Dialog.getString();
+			// Inset trace info
+			drawTrace = Dialog.getCheckbox();
+			traceLineThickness = Dialog.getNumber();
+			traceLineColor = Dialog.getString();
+			
+			// Updating parameter menu
+			GUITabs = Array.deleteValue(GUITabs, parameterChoice);
+			continue;
+		} else if (parameterChoice == "Calibration Parameters") {
+			Dialog.create("Calibration Parameters");
+			// Scale
+			// Scale bar booleans
+			Dialog.addCheckbox("Panel scale bar", true);
+			Dialog.addCheckbox("Inset scale bar", true);
+			// Calibration parameters
+			Dialog.addCheckbox("Use metadata scale info, ignore manual input", false);
+			Dialog.addNumber("Scale", 3, 10, 27, "unit per px");
+			Dialog.addString("Scale unit", "unit", 27);
+			
+			Dialog.show();
+			
+			// Fetching inputs
+			// Scale bar booleans
+			addPanelScaleBar = Dialog.getCheckbox();
+			addInsetScaleBar = Dialog.getCheckbox();
+			// Calibration parameters
+			useMDScale = Dialog.getCheckbox();
+			lenPerPx = Dialog.getNumber();
+			scaleUnit = Dialog.getString();
+			
+			
+			showMessage("Input Done", "Your input has been registered. Click OK to contninue.");
+			break;
+		}
+	}
 	
 	// Failsafe for binning and zoom combination
 	if (insetZoom > imgShrinkFactor) {
@@ -1061,50 +1099,3 @@ for (i = 0; i < imageList.length; i++) {
 // Exporting figure
 selectWindow("Figure");
 saveAs("Tiff", outputDir + "Figure");
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
