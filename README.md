@@ -5,17 +5,11 @@ Author: Ahmad Kamal Hamid, University of Zurich
 
 Version: 1.0, 27/11/2023 
  
-Description: This is the QanvasLab Microscopy Figure Builder, a tool aiming to optimize the balance between customizability and user-friendliness.
-  		Anyone who prepared microscopy figures for manuscripts or presentations knows that it's very frustrating. This tool hopefully reduces
-  		that frustration by allowing fellow scientists to prepare microscopy figures with the ability to customize panel distribution, zoomed insets,
-  		borders, color, text and arrow annotations, etc. 
+Description: This is the QanvasLab Microscopy Figure Builder, a tool aiming to optimize the balance between customizability and user-friendliness. Anyone who prepared microscopy figures for manuscripts or presentations knows that it's very frustrating. This tool hopefully reduces that frustration by allowing fellow scientists to prepare microscopy figures with the ability to customize panel distribution, zoomed insets, borders, color, text and arrow annotations, etc. 
 
-How to launch: There are many ways to launch a macro in ImageJ. The most straight forward approach is to open ImageJ/FIJI and then
-    Plugins > Macros > Run > Select the IJM file and follow the GUI
+How to launch: There are many ways to launch a macro in ImageJ. The most straight forward approach is to open ImageJ/FIJI and then Plugins > Macros > Run > Select the IJM file and follow the GUI
     
-Environment: FIJI/ImageJ 1.54f with the following list of plugins. Please note, most of the plugins were not used in this macro, but to  
-  		prevent incompatibility issues, the list contains everything in the ImageJ version that was used to develop the tool:
-    
+Environment: FIJI/ImageJ 1.54f with the following list of plugins. Please note, most of the plugins were not used in this macro, but to prevent incompatibility issues, the list contains everything in the ImageJ version that was used to develop the tool:
   			1) ImageJ
      
   			2) Fiji
@@ -49,7 +43,6 @@ Environment: FIJI/ImageJ 1.54f with the following list of plugins. Please note, 
      16) Neuroanatomy
 
 Workflow:
-  			
      1) Crop images to desired size (or expand canvas of subsequent images if they are smaller than crop size)
   			
      2) Choose panel alignment in case of mismatch between number of images provided and panel distribution requested
